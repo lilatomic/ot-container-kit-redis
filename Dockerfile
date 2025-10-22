@@ -9,8 +9,16 @@ LABEL version=1.0 \
       description="A production grade performance tuned redis docker image created by Opstree Solutions"
 
 ARG REDIS_VERSION="stable"
+ARG BUILD_WITH_MODULES=yes
+ENV BUILD_WITH_MODULES=$BUILD_WITH_MODULES
 
 RUN apk add --no-cache su-exec tzdata make curl build-base linux-headers bash openssl-dev
+RUN <<EOF
+if [ "$BUILD_WITH_MODULES" == "yes" ]; then
+ apk add autoconf automake bsd-compat-headers cmake cargo python3 py-virtualenv py3-pip git llvm-dev clang-dev clang-static ncurses-dev automake autoconf libtool
+ apk add clang clang-libclang g++ libffi-dev libgcc openssh openssl py3-cryptography py3-virtualenv python3-dev rsync tar unzip xsimd xz;
+fi
+EOF
 
 WORKDIR /tmp
 
@@ -52,6 +60,7 @@ RUN apk upgrade --no-cache
 
 COPY --from=builder /usr/local/bin/redis-server /usr/local/bin/redis-server
 COPY --from=builder /usr/local/bin/redis-cli /usr/local/bin/redis-cli
+COPY --from=builder /tmp/redis-stable/modules/*/*.so /modules/
 
 RUN addgroup -S -g 1000 redis && adduser -S -G redis -u 1000 redis && \
     apk add --no-cache bash libstdc++ libssl3 libcrypto3
