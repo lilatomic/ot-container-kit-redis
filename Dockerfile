@@ -9,7 +9,7 @@ LABEL version=1.0 \
       description="A production grade performance tuned redis docker image created by Opstree Solutions"
 
 ARG REDIS_VERSION="stable"
-ARG BUILD_WITH_MODULES=yes
+ARG BUILD_WITH_MODULES=no
 ENV BUILD_WITH_MODULES=$BUILD_WITH_MODULES
 
 RUN apk add --no-cache su-exec tzdata make curl build-base linux-headers bash openssl-dev
