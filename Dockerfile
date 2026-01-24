@@ -49,6 +49,7 @@ FROM alpine:3.22
 LABEL maintainer="Opstree Solutions"
 
 ARG TARGETARCH
+ARG REDIS_VERSION="stable"
 
 ENV REDIS_PORT=6379
 
@@ -60,7 +61,7 @@ RUN apk upgrade --no-cache
 
 COPY --from=builder /usr/local/bin/redis-server /usr/local/bin/redis-server
 COPY --from=builder /usr/local/bin/redis-cli /usr/local/bin/redis-cli
-COPY --from=builder /tmp/redis-stable/modules/*/*.so /modules/
+COPY --from=builder /tmp/redis-*/modules/*/*.so /modules/
 
 RUN addgroup -S -g 1000 redis && adduser -S -G redis -u 1000 redis && \
     apk add --no-cache bash libstdc++ libssl3 libcrypto3
