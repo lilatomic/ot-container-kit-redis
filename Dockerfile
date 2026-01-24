@@ -1,4 +1,4 @@
-FROM alpine:3.22 AS builder
+FROM alpine:3.23 AS builder
 
 LABEL maintainer="Opstree Solutions"
 
@@ -25,6 +25,15 @@ WORKDIR /tmp
 SHELL   ["bash", "-xe", "-c"]
 
 RUN <<EOF
+# if llvm-config isn't found, it's probably at `/usr/bin/llvm-config-${llvm_version}`
+# see https://gitlab.alpinelinux.org/alpine/aports/-/work_items/17773 and remove once that hits the repositories
+if ! command -v llvm-config &> /dev/null; then
+    LLVM_CONFIG=$(find /usr/bin -name "llvm-config*" | head -n 1)
+    if [ -n "$LLVM_CONFIG" ]; then
+        export LLVM_CONFIG_PATH="$LLVM_CONFIG"
+    fi
+fi
+
 VERSION=$(echo ${REDIS_VERSION} | sed -e "s/^v//g");
 case "${VERSION}" in
    latest | stable) REDIS_DOWNLOAD_URL="http://download.redis.io/redis-stable.tar.gz" && VERSION="stable";;
